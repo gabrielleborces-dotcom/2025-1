@@ -1,0 +1,27 @@
+{
+  "departments": [
+    "HR",
+    "Finance",
+    "Logistics",
+    "Sales",
+    "IT",
+    "Marketing",
+    "Admin",
+    "Customer Service",
+    "Procurement",
+    "R&D"
+  ],
+  "boxes": [
+    120,
+    95,
+    160,
+    180,
+    140,
+    100,
+    80,
+    110,
+    70,
+    90
+  ],
+  "target": 1500
+}

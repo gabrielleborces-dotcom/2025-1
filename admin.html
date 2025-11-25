@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Admin — Shoebox Dashboard</title>
+<style>body{font-family:Arial;max-width:900px;margin:auto;padding:20px}label{display:block;margin-top:12px;font-weight:bold}textarea,input{width:100%;padding:8px;margin-top:6px}button{padding:10px 14px;margin-top:10px}.status{white-space:pre-wrap;margin-top:12px}</style>
+</head>
+<body>
+<h1>Admin — Update Shared Shoebox Dataset</h1>
+<p>Enter admin password, edit dataset, and commit. The Netlify function will verify the password and commit <code>data.json</code> to the GitHub repo <strong>gabrielleborces-dotcom/2025-shoebox</strong>.</p>
+
+<label>Admin password</label>
+<input id="adminPass" type="password" placeholder="Enter admin password">
+
+<label>Departments (comma-separated)</label>
+<textarea id="departments">HR, Finance, Logistics, Sales, IT, Marketing, Admin, Customer Service, Procurement, R&D</textarea>
+
+<label>Shoebox counts (comma-separated)</label>
+<textarea id="boxes">120, 95, 160, 180, 140, 100, 80, 110, 70, 90</textarea>
+
+<label>Target</label>
+<input id="target" type="number" value="1500">
+
+<button id="preview">Preview JSON</button>
+<button id="commit">Commit via Netlify Function</button>
+
+<div class="status" id="status"></div>
+
+<script>
+function buildPayload() {
+  return {
+    departments: document.getElementById('departments').value.split(',').map(s=>s.trim()).filter(s=>s.length),
+    boxes: document.getElementById('boxes').value.split(',').map(s=>Number(s.trim())||0),
+    target: Number(document.getElementById('target').value) || 0
+  };
+}
+
+document.getElementById('preview').addEventListener('click', ()=>{
+  document.getElementById('status').textContent = JSON.stringify(buildPayload(), null, 2);
+});
+
+document.getElementById('commit').addEventListener('click', async ()=>{
+  const adminPass = document.getElementById('adminPass').value;
+  if(!adminPass) return alert('Enter admin password.');
+  const payload = buildPayload();
+  document.getElementById('status').textContent = 'Sending to Netlify function...';
+  try{
+    const res = await fetch('/.netlify/functions/updateData', { method: 'POST', body: JSON.stringify({ repoOwner: 'gabrielleborces-dotcom', repoName: '2025-shoebox', adminPassword: adminPass, data: payload }) });
+    const txt = await res.text();
+    document.getElementById('status').textContent = txt;
+  }catch(e){
+    document.getElementById('status').textContent = 'Error: ' + e.toString();
+  }
+});
+</script>
+</body>
+</html>
